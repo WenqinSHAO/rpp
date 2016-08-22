@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+    which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!-- One method to get references from the online citation libraries.
+    There has to be one entity for each item to be referenced.
+    An alternate method (rfc include) is described in the references. -->
+
+<!ENTITY RFC6830 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6830.xml">
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC6763 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6763.xml">
+<!ENTITY RFC1035 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.1035.xml">
+<!ENTITY RFC4632 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4632.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+    please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+    (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+    (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-ietf-rpp-00" ipr="trust200902">
+ <!-- category values: std, bcp, info, exp, and historic
+    ipr values: trust200902, noModificationTrust200902, noDerivativesTrust200902,
+       or pre5378Trust200902
+    you can add the attributes updates="NNNN" and obsoletes="NNNN"
+    they will automatically be output with "(if approved)" -->
+
+ <!-- ***** FRONT MATTER ***** -->
+
+ <front>
+   <!-- The abbreviated title is used in the page header - it is only necessary if the
+        full title is longer than 39 characters -->
+
+   <title abbrev="rpp">The Routing Preference Protocol</title>
+
+   <!-- add 'role="editor"' below for the editors if appropriate -->
+
+   <!-- Another author who claims to be an editor -->
+
+   <author fullname="François Devienne" initials="F." surname="Devienne">
+     <organization>BORDER 6</organization>
+
+     <address>
+       <postal>
+         <street> TO BE FILLED</street>
+
+         <!-- Reorder these if your country does things differently -->
+
+         <city></city>
+
+         <region></region>
+
+         <code></code>
+
+         <country>France</country>
+       </postal>
+
+       <phone></phone>
+
+       <email>francois.devienne@border6.com</email>
+
+       <!-- uri and facsimile elements may also be added -->
+     </address>
+   </author>
+
+   <author fullname="Mateusz Viste" initials="M." surname="Viste">
+     <organization>BORDER 6</organization>
+
+     <address>
+       <postal>
+         <street> TO BE FILLED</street>
+
+         <!-- Reorder these if your country does things differently -->
+
+         <city></city>
+
+         <region></region>
+
+         <code></code>
+
+         <country>France</country>
+       </postal>
+
+       <phone></phone>
+
+       <email>mateusz.viste@border6.com</email>
+
+       <!-- uri and facsimile elements may also be added -->
+     </address>
+   </author>
+
+	<author fullname="Wenqin Shao" initials="W.Q." surname="Shao">
+     <organization>Telecom ParisTech</organization>
+
+     <address>
+       <postal>
+         <street>23, avenue d'Italie</street>
+
+         <!-- Reorder these if your country does things differently -->
+
+         <city>Paris</city>
+
+         <region></region>
+
+         <code>75013</code>
+
+         <country>France</country>
+       </postal>
+
+       <phone></phone>
+
+       <email>wenqin.shao@telecom-paristech.fr</email>
+
+       <!-- uri and facsimile elements may also be added -->
+     </address>
+   </author>
+
+   <date month="July" year="2016" />
+
+   <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+        in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+
+   <!-- Meta-data Declarations -->
+
+   <area>General</area>
+
+   <workgroup>Internet Engineering Task Force</workgroup>
+
+   <!-- WG name at the upperleft corner of the doc,
+        IETF is fine for individual submissions.
+	 If this element is not present, the default is "Network Working Group",
+        which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+   <keyword>inter-domain routing</keyword>
+   <keyword>traffic engineering</keyword>
+   <keyword>inbound</keyword>
+
+   <!-- Keywords will be incorporated into HTML output
+        files in a meta tag but they have no effect on text or nroff
+        output. If you submit your draft to the RFC Editor, the
+        keywords will be used for the search engine. -->
+
+   <abstract>
+     <t>This memo describes a protocol allowing an Autonomous System (AS) to
+       perform inbound traffic engineering by
+       communicating directly its inbound routing preferences
+       to the networks that send out the traffic.</t>
+   </abstract>
+ </front>
+
+ <middle>
+   <section title="Introduction">
+     <t>Routing Preference Protocol (RPP) is an application layer protocol.
+     It aims at providing a routing-protocol-independant interface
+     for Autonomous Systems (ASes) to communicate their inbound routing preferences,
+     on the granularity of per BGP prefixes it originates,
+     directly to the traffic sourcing prefixes,
+     across the internet.</t>
+
+     <section anchor="motiv" title="Motivation">
+    	<t>Inbound Traffic Engineering (TE) in inter-domain routing consists in distributing the
+    	incoming traffic on to the available paths. 
+    	Manipulate inbound traffic with fine granularity allows, for example, congestion avoidance
+    	and transit cost minimisation.
+     	Current practices, deeply coupled with underlying inter-domain routing mechanism,
+     	fall short of such capabilities.</t>
+
+     	<t>With the Border Gateway Protocol (BGP), one can use selective announcement,
+     	AS-PATH prepending, MED and BGP community attributes to influence the routing of
+     	incoming traffic. The effects of all these appraoches remain coarse, uncertain and
+     	hard to manage according to <xref target="BGP_INBOUND_TE">Shao2015</xref>.</t>
+
+	 	<t>Locator/Identifier Separation Protocol (LISP) <xref target="RFC6830">RFC&nbsp;6830</xref>,
+	 	an alternative inter-domain routing protocol, allows the available routing options
+	 	(RLOC in LISP terminology) for destination prefixes (EID-prefixes) be registered with
+	 	configurable weights. Such expression of routing preference (EID-to-RLOC mapping)
+	 	is formulated by destination AS and is learnt and executed by the AS sourcing
+	 	the traffic.
+	 	However, its benefit is bundled with the deployment of LISP,
+	 	especially the EID-to-RLOC mapping system.
+	 	It requires packets in EID address space be encapsulated in RLOC space when routed,
+	 	which implies disruptive forwarding plane changes and eventually hinders the adoption of LISP.</t>
+		
+   		<t>The intention of RPP is to provide a routing-protocol-independent 
+    	channel to targetedly diffuse LISP-like inbound routing preference.
+    	With the wide and still increasing deployment of multihoming, we assume that the
+    	underlying inter-domain routing protocol, e.g. BGP, provides most of the time sufficient route disjointness,
+    	which allows a destination prefix be reached by different ingress providers if the source prefixe
+    	changes its egress providers.</t>
+    	
+	 </section>
+
+   <section anchor="scope" title="Scope">
+    <t>This document specifies the following issues:
+    <list style="symbols">
+        <t>First, how the RPP server of a prefix
+         MUST be registered and discovered.</t>
+        <t>Second, functionality and formats of protocol messages.</t>
+      </list></t>
+    <t>The interplay between RPP and the underlying routing system is up to each adopting network,
+    and is thus beyond this memo.</t>
+   </section>
+
+   <section anchor="about" title="About This Memo">
+    <t>The following of the memo is organised as follows.
+    <xref target="terms" /> specifies the terms used in the document.
+    <xref target="server_addr" /> describes the registration and discovery of RPP servers.
+    <xref target="proto" /> details the protocol exchange and message format.
+    At the end of the memo, <xref target="IANA">IANA</xref>
+    and <xref target="Security">security</xref> considerations are provided.</t>
+   </section>
+
+ </section>
+
+   <section anchor="terms" title="Terminology">
+      <t>The key words "", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+
+      <t>Here below are the definition of terms in this memo:
+       <list hangIndent="8" style="hanging">
+       	 <!--change network to AS-->
+       	 <t hangText="Destination AS/prefix"> The AS/prefix receiving traffic.</t>
+         <t hangText="Source AS/prefix"> The AS/prefix sending out traffic.</t>
+         <t hangText="Inbound routing preference"> It is about how destination prefixes prefer to
+         receive traffic, e.g. a specific upstream AS is prioritised.</t>
+         <t hangText="Message"> The unite of information exchanged through RPP.</t>
+         <t hangText="Command">The type of information carried by an RPP message.</t>
+         <t hangText="Prefix"> Routable prefix in the size announced by its originating
+         Autonomous System.</t>
+         <t hangText="RPP server"> Host with a public IPv4 and/or a IPv6 address that speaks RPP
+         on behalf of a set of prefixes.</t>
+         <t hangText="Delegated prefixes"> A set of prefixes that is under the regime of
+         one common RPP server specified by the context.</t>
+      </list></t>
+   </section>
+
+
+	 <section anchor="ov" title="Overview">
+     <t>RPP described in the memo provides a LISP-like mapping system,
+ 	 yet independant of LISP and any other inter-domain routing framework.
+ 	 Only inbound routing preference, homologue to EID-to-RLOC mapping in LISP,
+ 	 is exchanged through RPP.
+ 	 ASes that adopt RPP can freely choose their preferred way of executing learnt
+     routing preference.</t>
+
+     <t>Different from LISP, RPP does not follow a request-reply mechanism.
+     With RPP, the destination AS pushes its inbound routing preferences
+     unidirectionally to the source AS.
+     The source AS SHOULD satisfy the communicated
+     preferences, as long as the later doesn't violate its local routing policies.
+     </t>
+
+     <t> One and only one server sending out and receving routing preference is REQUIRED
+     for each prefix that wishes to enable this protocol.
+     Each RPP server is identified by its public IP address.
+     It MUST have one and only one IPv4 address, and MAY as well have one and only one IPv6 address.
+     Multiple prefixes, for example thoes belonging to a same AS, MAY mutualize one server.
+     </t>
+     
+     <t>Another major difference from LISP is that
+     RPP does not require a dedicated mapping system.
+     The protocol messages are directly exchanged between the RPP servers of the
+	 source and destination prefixes.
+	 DNS system is leveraged to discover the RPP server of a prefix.
+	 </t>
+	 </section>
+
+   	<section anchor="server_addr" title="Discover RPP server">
+   	<t>In order for the RPP server of a prefix to be discovered, a specific DNS record is REQUIRED. 
+   	The record MUST be of TXT type defined in <xref target="RFC1035">RFC&nbsp;1035</xref>.
+   	Meanwhile, the domain name of the entry MUST be the IN-ADDR.ARPA/IP6.ARPA domain, as well defined in
+   	<xref target="RFC1035">RFC&nbsp;1035</xref>, for the network address of
+   	the destination prefix.
+   	The destination prefix is implicitly assumed to be of the same size 
+   	as announced by the underlying routing protocol, i.e. BGP currently.
+   	For exemple, the network that owns the prefixe 185.86.53.0/24, SHALL install the following
+   	record on its DNS server, assuming 185.86.53.1 is the public IPv4 address of the RPP server:
+   	<list style="empty">
+   	<t>0.53.86.185.in-addr.arpa. IN TXT "RDE:185.86.53.1"</t>
+   	</list>
+   	"RDE" in the response stands for "RPP Decision Engine".
+   	Following "RDE:" in the response string, SHOULD be the public IPv4 or IPv6
+   	address of the RPP server.</t>
+
+    <t>In case that the RPP server discovery is failed, e.g. target prefix
+    is not RPP-enabled, only the routing preference communication becomes impossible.
+    Normal routing behaviour is not at all impacted.</t>
+
+   	</section>
+
+   	<section anchor="proto" title="The protocol">
+   		<t>RPP is a client-server protocol over TCP.
+   		It is also an one-way protocol, in the sense that only the client sends out RPP messages,
+   		while the server only passively receives.</t>
+
+   		<t>Each RPP server is in first place server in the protocol and listens
+   		permanently on port 4343.
+   		Meanwhile, it SHOULD act as well as client.
+   		A RPP server acts as client when its delegated prefixes conduct as destination prefixes.
+   		It pushes the inbound routing preferences
+   		of its delegated prefixes to the RPP servers of source prefixes.
+   		Routing preferences are coded in RPP messages.</t>
+
+   		<t>Only one RPP message SHOULD be sent in each TCP connection.
+   		TCP connection MUST be closed simultaneously once the message is received by the server side.</t>
+
+   		<t>The selection of source prefixes to which routing preferences are sent to, 
+   		is up to the AS managing the destination prefixes.
+   		An example could be a subset of source prefixes that represent 95% of total incoming
+   		traffic toward these destination prefixes.</t>
+
+   	<section anchor="msg" title="RPP message format">
+   		<t>
+   		Each RPP message MUST begin with one single command to specify its type and functionality,
+   		contain one single line,
+   		and terminate with a CR/LF line terminator.
+   		The command can be followed by lists of parameters.
+   		The command and the parameter lists (if exist) MUST be separated by a single space.
+   		Two neighbouring parameter lists MUST be separated by a tab symbol.
+   		A list can contain multiple single-space-separated parameters.
+   		<list style='empty'>
+   			<t>MESSAGE: COMMAND LIST_1\tLIST_2\t...\tLIST_n\r\n</t>
+   			<t>LIST: PARAM_1 PARAM_2 ... PARAM_n</t>
+   		</list>
+   		</t>
+   	</section>
+
+   	<section anchor="cmd" title="Command">
+   		<t>Currently, only one command is defined: SETINPREF.
+   		With this command, RPP server formulates inbound routing preference for its delegated
+   		prefixes.
+   		Three parameter lists SHOULD follow this command in order.
+   		<list style='numbers'>
+   			<t>TTL dictating the validity of the message, a list of one parameter in length.
+   			TTL SHOULD be an integer ranging from 1 to 2147483647 (2^31-1), in seconds.</t>
+   			<t>List of destination prefixes covered by this RPP message.
+   			Prefixes in the list MUST be delegated by the RPP server.
+   			They MUST be unique and non-overlapping.
+   			Prefixes MUST be of same size as they are announced via inter-domain routing protocol.
+   			They are REQUIRED to be written in <xref target="RFC4632">CIDR</xref> notation.</t>
+   			<t>List of weighted upstream ASNs.
+   			Upstreams are the last-one-hop ASes in the AS-PATHs via which traffic reaches the destination prefixes.
+   			A weight SHOULD be attached to each ASN in the upstream list.
+   			An upstream ASN and its weight SHOULD be concatenated with a colon.
+   			Weight MUST be an integer ranging from 0 to 255.
+   			Bigger value means higher preference.
+   			When an upstream is neither preferred nor depressed, it SHOULD be attached with a weight equalling 127.
+   			</t>
+   		</list>
+   		Assembling all the pieces, a SETINPREF type RPP message SHOULD fit in the following format:
+   		<list style='empty'>
+   			<t>SETINPREF TTL\tPf_1 Pf_2 ... Pf_n\tASN_1:W_1 ASN_2:W_2 ... ASN_m:W_m\r\n</t>
+   		</list>
+   		A source network is REQUIRED to fulfil the received preference as long as:
+   		<list style='symbols'>
+   			<t>TTL hasn't yet expired;</t>
+   			<t>Source AS learns a route that passes through the preferred AS;</t>
+   			<t>Forwarding the traffic through the preferred AS doesn't violate source AS's local policies.</t>
+   		</list>
+		A newly received RPP message SHOULD immediately replace the previous ones even if still valide.</t>
+
+   		<t>An example of SETINPREF message is given below:
+   		<list style='empty'>
+   			<t>SETINPREF 3600\t185.86.52.0/24 185.86.53.0/24\t43142:10 199758:127 30851:200\r\n</t>
+   		</list>
+   		This message can only be sent by the RPP server delegating both prefix 185.86.52.0/24 and 185.86.53.0/24.
+   		The routing preference contained in the message is valide for 1 hour.
+   		Both destination prefixes prefer that traffic come in via AS30851.
+   		AS199758 is as well acceptable but is less welcome than AS30851.
+   		AS43142 SHOULD be avoided if possible.</t>
+
+   	</section>
+   	</section>
+
+
+   <section anchor="IANA" title="IANA Considerations">
+     <t>TCP port 4343 need to be registered for RPP uses.</t>
+   </section>
+
+   <section anchor="Security" title="Security Considerations">
+     <t>It is RECOMMENDED that the RPP server of source prefix, i.e. server in RPP protocol,
+     verifies that each received RPP SETINPREF message contains only destination prefixes
+     that are delegated by the client, i.e. the RPP
+     server sending the message.
+     The validation can be done by performing RPP server discovery for each destination prefixe
+     included in the message, and then verify whether their RPP server addresses are the same and are
+     identical with the source IP address of the RPP message.</t>
+     
+     <t>If RPP communication is attacked or hijacked, only the transmission of
+     correct inbound route preference is endangered, while no impact is expected for the control plane
+     of underlying routing protocol. Hence, there is very limited security concerns related.</t>
+   </section>
+ </middle>
+
+ <!--  *****BACK MATTER ***** -->
+
+ <back>
+   <!-- References split into informative and normative -->
+
+   <!-- There are 2 ways to insert reference entries from the citation libraries:
+    1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
+    2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
+       (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
+
+    Both are cited textually in the same manner: by using xref elements.
+    If you use the PI option, xml2rfc will, by default, try to find included files in the same
+    directory as the including file. You can also define the XML_LIBRARY environment variable
+    with a value containing a set of directories to search.  These can be either in the local
+    filing system or remote ones accessed by http (http://domain/dir/... ).-->
+
+   <references title="Normative References">
+     <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+     &RFC2119;
+
+     &RFC1035;
+
+     &RFC4632;
+
+   </references>
+   <references title="Informative References">
+     <!-- Here we use entities that we defined at the beginning. -->
+
+     &RFC6830;
+
+   <reference anchor="BGP_INBOUND_TE" target="http://arxiv.org/abs/1511.08336">
+   	<front>
+   		<title>On the use of BGP communities for fine-grained inbound traffic engineering</title>
+   		<author initials="W.Q." surname="Shao">
+   			<organization>Telecom ParisTech</organization>
+   		</author>
+   		<author initials="L." surname="Iannone">
+   			<organization>Telecom ParisTech</organization>
+   		</author>
+   		<author initials="J.L." surname="Rougier">
+   			<organization>Telecom ParisTech</organization>
+   		</author>
+   		<author initials="F." surname="Devienne">
+   			<organization>BORDER 6</organization>
+   		</author>
+   		<date year="2015" />
+   	</front>
+   </reference>
+
+   </references>
+
+ </back>
+</rfc>
